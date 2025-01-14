@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Prata&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+a.active hr{
+    display: block;
+}
+
+*{
+    font-family: Outfit;
+}
+
+.prata-regular {
+  font-family: "Prata", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+::-webkit-scrollbar{
+  display: none;
+}
+
+@media (max-width:640px) {
+  a.active{
+      background-color: #000000;
+      color: white;
+  }
+}
+
+body.light {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.dark {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.bg-gray-900 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0, 0, 0 / var(--tw-bg-opacity, 1));
+}
+
+.dark .text-gray-700 {
+  --tw-text-opacity: 1;
+  color: rgb(1, 1, 1 / var(--tw-text-opacity, 1));
+}
+
+.countp {
+  --tw-text-opacity: 1;
+  color: rgb(0, 0, 0 / var(--tw-text-opacity, 1));
+}
+
+.text-gray-500 {
+  --tw-text-opacity: 1;
+  color: rgb(1, 1, 1 / var(--tw-text-opacity, 1));
+}
+
+.text-gray-600 {
+  --tw-text-opacity: 1;
+  color: rgb(1, 1, 1 / var(--tw-text-opacity, 1));
+}
+
+.text-\[\#414141\] {
+  --tw-text-opacity: 1;
+  color: rgb(1, 1, 1 / var(--tw-text-opacity, 1));
+}
+
+.bg-slate-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(241 245 249 / var(--tw-bg-opacity, 1)); /* Светъл режим */
+}
+
+.dark .bg-slate-100 {
+  background-color: rgb(1 1 1 / var(--tw-bg-opacity, 1)); /* Тъмен режим */
+}
+
