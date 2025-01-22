@@ -41,7 +41,7 @@ const placeOrder = async (req, res) => {
 // Placing orders using Stripe Method
 const placeOrderStripe = async (req, res) => {
     try {
-        const { userId, items, amount, address, delivery_company_name } = req.body
+        const { userId, items, amount, address, delivery_company_name } = req.body;
         const { origin } = req.headers;
 
         const orderData = {
@@ -55,43 +55,55 @@ const placeOrderStripe = async (req, res) => {
             delivery_company: delivery_company_name
         }
 
-        const newOrder = new orderModel(orderData)
-        await newOrder.save()
+        console.log(items);
 
-        const line_items = items.map((item) => ({
-            price_data: {
-                currency: currency,
-                product_data: {
-                    name: item.name
+        const newOrder = new orderModel(orderData);
+        await newOrder.save();
+
+        const line_items = items.map((item) => {
+            // Разделяме низа от формат: 'Име на продукта x брой x единична_цена'
+            const parts = item.split(' x ');
+            const productName = parts[0];  // Име на продукта
+            const quantity = parseInt(parts[1]);  // Брой
+            const unitPrice = parseFloat(parts[2]);  // Единична цена
+
+            return {
+                price_data: {
+                    currency: currency,  // Може да дефинирате валутата преди това
+                    product_data: {
+                        name: productName
+                    },
+                    unit_amount: unitPrice * 100  // Преобразуваме в стотинки за Stripe
                 },
-                unit_amount: item.price * 100
-            },
-            quantity: item.quantity
-        }))
+                quantity: quantity
+            };
+        });
 
+        // Добавяме такса за доставка (ако има такава)
         line_items.push({
             price_data: {
-                currency: currency,
+                currency: currency,  // Може да дефинирате валутата преди това
                 product_data: {
                     name: 'Delivery Charges'
                 },
-                unit_amount: deliveryCharge * 100
+                unit_amount: deliveryCharge * 100  // Такса за доставка в стотинки
             },
             quantity: 1
-        })
+        });
 
+        // Създаване на сесия за Stripe Checkout
         const session = await stripe.checkout.sessions.create({
             success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
             cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
             line_items,
             mode: 'payment',
-        })
+        });
 
         res.json({ success: true, session_url: session.url });
 
     } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
+        console.log(error);
+        res.json({ success: false, message: error.message });
     }
 }
 

@@ -93,7 +93,7 @@ const ShopContextProvider = (props) => {
         for (const itemId in cartItems) {
             const itemInfo = products.find((product) => product._id === itemId);
             if (itemInfo && typeof cartItems[itemId] === "number" && cartItems[itemId] > 0) {
-                result_arr.push(`${itemInfo.name} x ${cartItems[itemId]}`);
+                result_arr.push(`${itemInfo.name} x ${cartItems[itemId]} x ${itemInfo.price}`);
             }
         }
     

@@ -69,10 +69,11 @@ const Orders = () => {
                         const itemParts = item.split(' x ');
                         const productName = itemParts[0];
                         const quantity = itemParts[1] ? itemParts[1] : 'N/A'; // Ако няма количество, показваме "N/A"
+                        const price = itemParts[2];
 
                         return (
                           <p key={itemIndex}>
-                            {productName} x {quantity}
+                            {productName} x {quantity} x {price}
                           </p>
                         );
                       })
