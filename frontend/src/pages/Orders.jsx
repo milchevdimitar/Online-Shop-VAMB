@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
-import { ShopContext } from "../context/ShopContext"; // Обърнете внимание на пътя
+import { ShopContext } from "../context/ShopContext";
 import Title from "../components/Title";
 import axios from "axios";
 
 const Orders = () => {
-  const { backendUrl, token, currency } = useContext(ShopContext); // Прочитаме стойностите от контекста
+  const { backendUrl, token, currency } = useContext(ShopContext);
   const [orderData, setOrderData] = useState([]);
 
   const loadOrderData = async () => {
@@ -18,7 +18,7 @@ const Orders = () => {
       );
 
       if (response.data.success && Array.isArray(response.data.orders)) {
-        setOrderData(response.data.orders.reverse()); // Задаваме поръчките в състоянието
+        setOrderData(response.data.orders.reverse()); 
       } else {
         console.error("No orders found or response format is incorrect");
       }
@@ -65,10 +65,9 @@ const Orders = () => {
                   <td className="py-4 px-4">
                     {order.items.length > 0 ? (
                       order.items.map((item, itemIndex) => {
-                        // Разделяме елемента на продукта и количеството
                         const itemParts = item.split(' x ');
                         const productName = itemParts[0];
-                        const quantity = itemParts[1] ? itemParts[1] : 'N/A'; // Ако няма количество, показваме "N/A"
+                        const quantity = itemParts[1] ? itemParts[1] : 'N/A';
                         const price = itemParts[2];
 
                         return (

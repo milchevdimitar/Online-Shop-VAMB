@@ -1,6 +1,5 @@
 import userModel from "../models/userModel.js";
 
-// Add products to user cart
 const addToCart = async (req, res) => {
     try {
         const { userId, itemId } = req.body;
@@ -15,12 +14,12 @@ const addToCart = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        const cartData = userData.cartData || {}; // Initialize cartData if it's undefined
+        const cartData = userData.cartData || {};
 
         if (cartData[itemId]) {
-            cartData[itemId] += 1; // Increment quantity if item exists
+            cartData[itemId] += 1; 
         } else {
-            cartData[itemId] = 1; // Add item with quantity 1 if it doesn't exist
+            cartData[itemId] = 1; 
         }
 
         await userModel.findByIdAndUpdate(userId, { cartData });
@@ -32,7 +31,6 @@ const addToCart = async (req, res) => {
     }
 };
 
-// Update user cart
 const updateCart = async (req, res) => {
     try {
         const { userId, itemId, quantity } = req.body;
@@ -47,12 +45,12 @@ const updateCart = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        const cartData = userData.cartData || {}; // Initialize cartData if it's undefined
+        const cartData = userData.cartData || {};
 
         if (quantity === 0) {
-            delete cartData[itemId]; // Remove item if quantity is 0
+            delete cartData[itemId]; 
         } else {
-            cartData[itemId] = quantity; // Update item quantity
+            cartData[itemId] = quantity; 
         }
 
         await userModel.findByIdAndUpdate(userId, { cartData });
@@ -79,7 +77,7 @@ const getUserCart = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        const cartData = userData.cartData || {}; // Ensure cartData is an object
+        const cartData = userData.cartData || {};
 
         res.json({ success: true, cartData });
     } catch (error) {

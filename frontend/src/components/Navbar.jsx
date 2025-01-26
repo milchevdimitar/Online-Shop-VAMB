@@ -26,7 +26,7 @@ const Navbar = () => {
 
     return (
         <div className={`flex items-center justify-between py-5 font-medium ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-700'}`}>
-            {/* Лого */}
+            {}
             <Link to='/'>
                 <img src={getAsset('logo')} className='w-36' alt="Logo" />
             </Link>
@@ -47,7 +47,7 @@ const Navbar = () => {
             </ul>
 
             <div className='flex items-center gap-6'>
-                {/* Смяна на тема */}
+                {}
                 <button 
                     onClick={() => {
                         setDarkMode(!darkMode);
@@ -58,11 +58,11 @@ const Navbar = () => {
                     {darkMode ? "☀️" : "🌙"} 
                 </button>
 
-                {/* Икона за търсене */}
+                {}
                 <img onClick={() => { setShowSearch(true); navigate('/collection'); }} 
                     src={getAsset('search_icon')} className='w-5 cursor-pointer' alt="Search" />
 
-                {/* Икона за профил */}
+                {}
                 <div className='group relative'>
                     <img onClick={() => token ? null : navigate('/login')} className='w-5 cursor-pointer' 
                         src={getAsset('profile_icon')} alt="Profile" />
@@ -76,7 +76,7 @@ const Navbar = () => {
                     )}
                 </div>
 
-                {/* Икона за количка */}
+                {}
                 <Link to='/cart' className='relative'>
                     <img src={getAsset('cart_icon')} className='w-5 min-w-5' alt="Cart" />
                     <p className='absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]'>
@@ -84,11 +84,11 @@ const Navbar = () => {
                     </p>
                 </Link>
 
-                {/* Меню */}
+                {}
                 <img onClick={() => setVisible(true)} src={getAsset('menu_icon')} className='w-5 cursor-pointer sm:hidden' alt="Menu" />
             </div>
 
-            {/* Скрито меню */}
+            {}
             <div className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${visible ? 'w-full' : 'w-0'}`}>
                 <div className='flex flex-col text-gray-600'>
                     <div onClick={() => setVisible(false)} className='flex items-center gap-4 p-3 cursor-pointer'>

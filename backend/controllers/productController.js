@@ -1,7 +1,6 @@
 import { v2 as cloudinary } from "cloudinary"
 import productModel from "../models/productModel.js"
 
-// function for add product
 const addProduct = async (req, res) => {
     try {
         const { 
@@ -12,7 +11,7 @@ const addProduct = async (req, res) => {
             category, 
             subCategory, 
             bestseller, 
-            compatibleModels // Ново поле
+            compatibleModels
         } = req.body;
 
         const image1 = req.files.image1 && req.files.image1[0];
@@ -55,7 +54,6 @@ const addProduct = async (req, res) => {
     }
 }
 
-// function for list product
 const listProducts = async (req, res) => {
     try {
         const products = await productModel.find({});
@@ -67,7 +65,6 @@ const listProducts = async (req, res) => {
 }
 
 
-// function for removing product
 const removeProduct = async (req, res) => {
     try {
         
@@ -80,7 +77,6 @@ const removeProduct = async (req, res) => {
     }
 }
 
-// function for single product info
 const singleProduct = async (req, res) => {
     try {
         

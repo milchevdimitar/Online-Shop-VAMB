@@ -7,7 +7,7 @@ const OurPolicy = () => {
     return (
         <div className="policies-section py-10 bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-white">
             <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                {/* Easy Exchange Policy */}
+                {}
                 <div className="policy">
                     <img
                         src={darkMode ? assets.exchange_icon.dark : assets.exchange_icon.light}
@@ -18,7 +18,7 @@ const OurPolicy = () => {
                     <p>We offer hassle-free exchange policy</p>
                 </div>
 
-                {/* 7 Days Return Policy */}
+                {}
                 <div className="policy">
                     <img
                         src={darkMode ? assets.quality_icon.dark : assets.quality_icon.light}
@@ -29,7 +29,7 @@ const OurPolicy = () => {
                     <p>We provide 7 days free return policy</p>
                 </div>
 
-                {/* Best Customer Support */}
+                {}
                 <div className="policy">
                     <img
                         src={darkMode ? assets.support_img.dark : assets.support_img.light}

@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 
 module.exports = {
-  darkMode: 'class', // Активиране на клас-базиран dark mode
-  content: ['./src/**/*.{js,jsx,ts,tsx}'], // Пътища до твоите файлове
+  darkMode: 'class', 
+  content: ['./src/**/*.{js,jsx,ts,tsx}'], 
   theme: {
     extend: {},
   },

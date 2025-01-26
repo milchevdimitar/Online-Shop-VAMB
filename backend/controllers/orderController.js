@@ -2,14 +2,11 @@ import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import Stripe from 'stripe'
 
-// global variables
 const currency = 'bgn'
 const deliveryCharge = 10
 
-// gateway initialize
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-// Placing orders using COD Method
 const placeOrder = async (req, res) => {
     try {
         const { userId, items, amount, address, delivery_company_name } = req.body;
@@ -38,7 +35,6 @@ const placeOrder = async (req, res) => {
     }
 }
 
-// Placing orders using Stripe Method
 const placeOrderStripe = async (req, res) => {
     try {
         const { userId, items, amount, address, delivery_company_name } = req.body;
@@ -55,43 +51,38 @@ const placeOrderStripe = async (req, res) => {
             delivery_company: delivery_company_name
         }
 
-        console.log(items);
-
         const newOrder = new orderModel(orderData);
         await newOrder.save();
 
         const line_items = items.map((item) => {
-            // Разделяме низа от формат: 'Име на продукта x брой x единична_цена'
             const parts = item.split(' x ');
-            const productName = parts[0];  // Име на продукта
-            const quantity = parseInt(parts[1]);  // Брой
-            const unitPrice = parseFloat(parts[2]);  // Единична цена
+            const productName = parts[0];
+            const quantity = parseInt(parts[1]);
+            const unitPrice = parseFloat(parts[2]);
 
             return {
                 price_data: {
-                    currency: currency,  // Може да дефинирате валутата преди това
+                    currency: currency,  
                     product_data: {
                         name: productName
                     },
-                    unit_amount: unitPrice * 100  // Преобразуваме в стотинки за Stripe
+                    unit_amount: unitPrice * 100  
                 },
                 quantity: quantity
             };
         });
 
-        // Добавяме такса за доставка (ако има такава)
         line_items.push({
             price_data: {
-                currency: currency,  // Може да дефинирате валутата преди това
+                currency: currency, 
                 product_data: {
                     name: 'Delivery Charges'
                 },
-                unit_amount: deliveryCharge * 100  // Такса за доставка в стотинки
+                unit_amount: deliveryCharge * 100  
             },
             quantity: 1
         });
 
-        // Създаване на сесия за Stripe Checkout
         const session = await stripe.checkout.sessions.create({
             success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
             cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
@@ -107,7 +98,6 @@ const placeOrderStripe = async (req, res) => {
     }
 }
 
-// Verify Stripe 
 const verifyStripe = async (req, res) => {
 
     const { orderId, success, userId } = req.body
@@ -128,7 +118,6 @@ const verifyStripe = async (req, res) => {
     }
 }
 
-// All Orders data for Admin Panel
 const allOrders = async (req, res) => {
     try {
         const orders = await orderModel.find({})
@@ -140,7 +129,6 @@ const allOrders = async (req, res) => {
     }
 }
 
-// User Order Data For Frontend
 const userOrders = async (req, res) => {
     try {
         const { userId } = req.body
@@ -154,7 +142,6 @@ const userOrders = async (req, res) => {
     }
 }
 
-// update order status from Admin Panel
 const updateStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body

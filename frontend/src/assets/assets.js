@@ -29,7 +29,6 @@ import ekont_logo from './ekont_logo.png';
 import speedy_logo from './speedy_logo.png';
 
 export const assets = {
-    // Икони със светъл и тъмен режим
     cart_icon: {
         light: cart_icon_light,
         dark: cart_icon_dark,
