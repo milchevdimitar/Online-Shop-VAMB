@@ -78,3 +78,29 @@ body.dark {
   background-color: rgb(1 1 1 / var(--tw-bg-opacity, 1)); /* Тъмен режим */
 }
 
+.dot {
+  font-size: 24px;
+  animation: bounce 1s infinite;
+}
+
+.dot1 {
+  animation-delay: 0s;
+}
+
+.dot2 {
+  animation-delay: 0.2s;
+}
+
+.dot3 {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
