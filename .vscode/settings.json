@@ -1,0 +1,18 @@
+{
+    "dbcode.connections": [
+        {
+            "connectionId": "ezjYiUDpA9DjaSkDaZvfm",
+            "name": "Diplomna",
+            "driver": "mongodb",
+            "connectionType": "host",
+            "driverOptions": {
+                "protocol": "mongodb://"
+            },
+            "host": "127.0.0.1",
+            "port": 27017,
+            "ssl": false,
+            "savePassword": "secretStorage",
+            "connectionTimeout": 30
+        }
+    ]
+}
