@@ -6,6 +6,7 @@ import axios from "axios";
 const Orders = () => {
   const { backendUrl, token, currency } = useContext(ShopContext);
   const [orderData, setOrderData] = useState([]);
+  const [userDetails, setUserDetails] = useState({ rank: "", totalSpent: 0 });
 
   const loadOrderData = async () => {
     try {
@@ -18,7 +19,7 @@ const Orders = () => {
       );
 
       if (response.data.success && Array.isArray(response.data.orders)) {
-        setOrderData(response.data.orders.reverse()); 
+        setOrderData(response.data.orders.reverse());
       } else {
         console.error("No orders found or response format is incorrect");
       }
@@ -27,14 +28,42 @@ const Orders = () => {
     }
   };
 
+  const loadUserDetails = async () => {
+    try {
+      if (!token) return;
+
+      const response = await axios.get(backendUrl + "/api/users/me", {
+        headers: { token },
+      });
+
+      if (response.data) {
+        setUserDetails(response.data);
+      } else {
+        console.error("User details not found or response format is incorrect");
+      }
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
   useEffect(() => {
     loadOrderData();
+    loadUserDetails();
   }, [token]);
 
   return (
     <div className="border-t pt-16">
       <div className="text-2xl">
         <Title text1={"MY"} text2={"ORDERS"} />
+      </div>
+
+      <div className="mb-6 p-4 bg-gray-100 rounded-lg shadow-md">
+        <p className="text-lg font-semibold">
+          Вашият ранг: <span className="text-blue-600">{userDetails.rank}</span>
+        </p>
+        <p className="text-sm text-gray-600">
+          Общ оборот: {currency} {userDetails.totalSpent.toFixed(2)}
+        </p>
       </div>
 
       <div className="overflow-x-auto">
@@ -65,9 +94,9 @@ const Orders = () => {
                   <td className="py-4 px-4">
                     {order.items.length > 0 ? (
                       order.items.map((item, itemIndex) => {
-                        const itemParts = item.split(' x ');
+                        const itemParts = item.split(" x ");
                         const productName = itemParts[0];
-                        const quantity = itemParts[1] ? itemParts[1] : 'N/A';
+                        const quantity = itemParts[1] ? itemParts[1] : "N/A";
                         const price = itemParts[2];
 
                         return (
