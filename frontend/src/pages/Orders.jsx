@@ -68,7 +68,7 @@ const Orders = () => {
       
       <div className="mb-6 p-4 bg-gray-100 rounded-lg shadow-md">
         <p className="text-lg font-semibold">
-          Вашият ранг: <span className="text-blue-600">Genious {userDetails.rank || "Няма"}</span>
+          Вашият ранк: <span className="text-blue-600">Genious {userDetails.rank || "Няма"}</span>
         </p>
         <p className="text-sm text-gray-600">
           Общ оборот: {currency} {userDetails.moneyspent.toFixed(2)}

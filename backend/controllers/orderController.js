@@ -8,50 +8,81 @@ const deliveryCharge = 10
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
+const getDiscountByRank = (rank) => {
+    const discounts = {
+        "4": 0,   
+        "3": 5,  
+        "2": 10,   
+        "1": 20 
+    };
+
+    return discounts[rank] || 0;
+};
+
+
 const placeOrder = async (req, res) => {
     try {
         const { userId, items, amount, address, delivery_company_name } = req.body;
+
+        const user = await userModel.findById(userId);
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+        const discountPercentage = getDiscountByRank(user.rank);
+        const discountAmount = ((amount - deliveryCharge) * discountPercentage) / 100;
+        const finalAmount = (amount - deliveryCharge) - discountAmount;
 
         const orderData = {
             userId,
             items,
             address,
-            amount,
+            amount: finalAmount,
             paymentMethod: "COD",
             payment: false,
             date: Date.now(),
             delivery_company: delivery_company_name
-        }
+        };
 
-        const newOrder = new orderModel(orderData)
-        await newOrder.save()
+        const newOrder = new orderModel(orderData);
+        await newOrder.save();
 
-        await userModel.findByIdAndUpdate(userId, { cartData: {} })
-        await updateUserMoneySpent(userId, orderData.amount);
+        await userModel.findByIdAndUpdate(userId, { cartData: {} });
+        await updateUserMoneySpent(userId, finalAmount);
 
-        res.json({ success: true, message: "Order Placed" })
+        res.json({ success: true, message: "Order Placed", finalAmount });
 
     } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
+        console.log(error);
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
+
 
 const placeOrderStripe = async (req, res) => {
     try {
         const { userId, items, amount, address, delivery_company_name } = req.body;
         const { origin } = req.headers;
 
+        const user = await userModel.findById(userId);
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+        const discountPercentage = getDiscountByRank(user.rank);
+        const discountAmount = ((amount - deliveryCharge) * discountPercentage) / 100;
+        const finalAmount = (amount - deliveryCharge) - discountAmount;
+
+        console.log(amount, discountPercentage, finalAmount);
+
         const orderData = {
             userId,
             items,
             address,
-            amount,
+            amount: finalAmount,
             paymentMethod: "Stripe",
             payment: false,
             date: Date.now(),
             delivery_company: delivery_company_name
-        }
+        };
+
+        console.log(orderData);
 
         const newOrder = new orderModel(orderData);
         await newOrder.save();
@@ -64,11 +95,11 @@ const placeOrderStripe = async (req, res) => {
 
             return {
                 price_data: {
-                    currency: currency,  
+                    currency: currency,
                     product_data: {
                         name: productName
                     },
-                    unit_amount: unitPrice * 100  
+                    unit_amount: unitPrice * (100 - discountPercentage)
                 },
                 quantity: quantity
             };
@@ -76,11 +107,11 @@ const placeOrderStripe = async (req, res) => {
 
         line_items.push({
             price_data: {
-                currency: currency, 
+                currency: currency,
                 product_data: {
                     name: 'Delivery Charges'
                 },
-                unit_amount: deliveryCharge * 100  
+                unit_amount: deliveryCharge * 100
             },
             quantity: 1
         });
@@ -92,13 +123,14 @@ const placeOrderStripe = async (req, res) => {
             mode: 'payment',
         });
 
-        res.json({ success: true, session_url: session.url });
+        res.json({ success: true, session_url: session.url, finalAmount });
 
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
+
 
 const verifyStripe = async (req, res) => {
     const { orderId, success, userId } = req.body;
