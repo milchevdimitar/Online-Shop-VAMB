@@ -111,7 +111,9 @@ const Orders = () => {
                   <td className="py-4 px-4">{currency} {order.amount}</td>
                   <td className="py-4 px-4">{new Date(order.date).toLocaleDateString()}</td>
                   <td className="py-4 px-4">{order.payment ? "Completed" : "Pending"}</td>
-                  <td className="py-4 px-4">{order.delivery_company}</td>
+                  <td className="py-4 px-4">
+                    <img src={`../src/assets/${order.delivery_company}_logo.png`} style={{ width: "50px", height: "auto" }}/>
+                  </td>
                   <td className="py-4 px-4">
                     <span className={`px-2 py-1 rounded-lg text-white ${order.status === "Delivered" ? "bg-green-500" : order.status === "Pending" ? "bg-yellow-500" : "bg-red-500"}`}>
                       {order.status}

@@ -1,15 +1,22 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { ShopContext } from '../context/ShopContext';
 import ReactMarkdown from "react-markdown";
 import { Send, MessageSquare } from "lucide-react";
 
 const GeminiChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => {
+    const savedMessages = sessionStorage.getItem("chatMessages");
+    return savedMessages ? JSON.parse(savedMessages) : [];
+  });
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { backendUrl } = useContext(ShopContext);
+
+  useEffect(() => {
+    sessionStorage.setItem("chatMessages", JSON.stringify(messages));
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -20,12 +27,10 @@ const GeminiChatbot = () => {
     setLoading(true);
 
     try {
-      console.log("Изпращане на съобщение към сървъра:", input);
-
       const response = await fetch(`${backendUrl}/api/geminiChat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: input, history: messages }),
       });
 
       if (!response.ok) {
@@ -35,7 +40,7 @@ const GeminiChatbot = () => {
 
       const data = await response.json();
       const botMessage = { sender: "bot", text: data.reply };
-      setMessages((prevMessages) => [...prevMessages, userMessage, botMessage]);
+      setMessages((prevMessages) => [...prevMessages, botMessage]);
     } catch (error) {
       console.error("Грешка при изпращане на съобщението:", error);
     } finally {

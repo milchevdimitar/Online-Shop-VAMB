@@ -52,7 +52,7 @@ const UserList = ({ token }) => {
         <div className='hidden md:grid grid-cols-[1fr_2fr_2fr_2fr_1fr] items-center py-1 px-2 border bg-gray-100 text-sm'>
           <b>ПОТРЕБИТЕЛ</b>
           <b>EMAIL</b>
-          <b>РАНГ</b>
+          <b>РАНК</b>
           <b>ОБОРОТ</b>
           <b className='text-center'>ДЕЙСТВИЯ</b>
         </div>
