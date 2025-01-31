@@ -1,6 +1,7 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import Stripe from 'stripe'
+import { calculateRank } from "./userController.js";
 
 const currency = 'bgn'
 const deliveryCharge = 10
@@ -26,6 +27,7 @@ const placeOrder = async (req, res) => {
         await newOrder.save()
 
         await userModel.findByIdAndUpdate(userId, { cartData: {} })
+        await updateUserMoneySpent(userId, orderData.amount);
 
         res.json({ success: true, message: "Order Placed" })
 
@@ -99,24 +101,30 @@ const placeOrderStripe = async (req, res) => {
 }
 
 const verifyStripe = async (req, res) => {
-
-    const { orderId, success, userId } = req.body
+    const { orderId, success, userId } = req.body;
 
     try {
+        const order = await orderModel.findById(orderId);
+        if (!order) {
+            return res.json({ success: false, message: "Order not found" });
+        }
+
         if (success === "true") {
             await orderModel.findByIdAndUpdate(orderId, { payment: true });
-            await userModel.findByIdAndUpdate(userId, { cartData: {} })
+            await updateUserMoneySpent(userId, order.amount);
+            await userModel.findByIdAndUpdate(userId, { cartData: {} });
+
             res.json({ success: true });
         } else {
-            await orderModel.findByIdAndDelete(orderId)
-            res.json({ success: false })
+            await orderModel.findByIdAndDelete(orderId);
+            res.json({ success: false });
         }
 
     } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
+        console.log(error);
+        res.json({ success: false, message: error.message });
     }
-}
+};
 
 const allOrders = async (req, res) => {
     try {
@@ -155,4 +163,18 @@ const updateStatus = async (req, res) => {
     }
 }
 
-export { verifyStripe, placeOrder, placeOrderStripe, allOrders, userOrders, updateStatus }
+const updateUserMoneySpent = async (userId, amount) => {
+    try {
+        const user = await userModel.findById(userId);
+        if (!user) return;
+
+        user.moneyspent = (user.moneyspent || 0) + amount;
+        user.rank = calculateRank(user.moneyspent);
+        await user.save();
+    } catch (error) {
+        console.error("Error updating user money spent:", error);
+    }
+};
+
+
+export { verifyStripe, placeOrder, placeOrderStripe, allOrders, userOrders, updateStatus, updateUserMoneySpent }

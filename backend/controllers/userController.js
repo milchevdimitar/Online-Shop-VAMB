@@ -2,28 +2,26 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
-import orderModel from "../models/orderModel.js"; // Добави импорта за модела на поръчките
+import orderModel from "../models/orderModel.js";
 
-// Функция за изчисляване на ранк
 const calculateRank = (moneyspent) => {
-    if (moneyspent > 10000) return 1;
-    if (moneyspent > 5000) return 2;
-    if (moneyspent > 1000) return 3;
+    if (moneyspent > 30000) return 1;
+    if (moneyspent > 10000) return 2;
+    if (moneyspent > 5000) return 3;
     return 4;
 };
 
-// Актуализира ранковете за всички потребители
 const updateUserRanks = async (req, res) => {
     try {
         const users = await userModel.find();
 
         for (const user of users) {
-            // Изчисляване на общия оборот за потребителя
+
             const orders = await orderModel.find({ user: user._id });
             const moneyspent = orders.reduce((sum, order) => sum + order.amount, 0);
 
-            user.moneyspent = moneyspent; // Обновяване на полето moneyspent
-            user.rank = calculateRank(moneyspent); // Обновяване на ранка
+            user.moneyspent = moneyspent;
+            user.rank = calculateRank(moneyspent);
             await user.save();
         }
 
@@ -33,23 +31,21 @@ const updateUserRanks = async (req, res) => {
     }
 };
 
-// Връща информация за текущия потребител
 const getUserDetails = async (req, res) => {
     try {
         const userId = req.user.id;
+        console.log("User ID from token:", req.user?.id);
         const user = await userModel.findById(userId);
+        console.log("Fetched User _ :", user);        
 
         if (!user) {
             return res.status(404).json({ message: "User not found 404" });
         }
 
-        // Изчисляване на общия оборот за текущия потребител
         const orders = await orderModel.find({ user: user._id });
-        const moneyspent = orders.reduce((sum, order) => sum + order.amount, 0);
 
-        user.moneyspent = moneyspent; // Обновяване на полето moneyspent
-        user.rank = calculateRank(moneyspent); // Обновяване на ранка
-        await user.save(); // Запазване на обновените данни
+        console.log(user.moneyspent, user.rank); 
+        await user.save(); 
 
         res.status(200).json({
             rank: user.rank,
@@ -60,12 +56,9 @@ const getUserDetails = async (req, res) => {
     }
 };
 
-// Функция за създаване на токен
 const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET);
 };
-
-// Останалите функции са непроменени
 
 const loginUser = async (req, res) => {
     try {
@@ -143,4 +136,4 @@ const adminLogin = async (req, res) => {
     }
 };
 
-export { loginUser, registerUser, adminLogin, updateUserRanks, getUserDetails };
+export { loginUser, registerUser, adminLogin, updateUserRanks, getUserDetails, calculateRank };

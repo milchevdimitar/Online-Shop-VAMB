@@ -37,7 +37,7 @@ const addProduct = async (req, res) => {
             subCategory,
             bestseller: bestseller === "true" ? true : false,
             image: imagesUrl,
-            compatibleModels: compatibleModels ? compatibleModels.split(",") : [], // Обработка на масива
+            compatibleModels: compatibleModels ? compatibleModels.split(",") : [],
             date: Date.now()
         };
 

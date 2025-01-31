@@ -6,7 +6,8 @@ import axios from "axios";
 const Orders = () => {
   const { backendUrl, token, currency } = useContext(ShopContext);
   const [orderData, setOrderData] = useState([]);
-  const [userDetails, setUserDetails] = useState({ rank: "", totalSpent: 0 });
+  const [userDetails, setUserDetails] = useState({ rank: "", moneyspent: 0 });
+  const [loading, setLoading] = useState(true);
 
   const loadOrderData = async () => {
     try {
@@ -32,7 +33,7 @@ const Orders = () => {
     try {
       if (!token) return;
 
-      const response = await axios.get(backendUrl + "/api/users/me", {
+      const response = await axios.get(backendUrl + "/api/user/me", {
         headers: { token },
       });
 
@@ -47,105 +48,81 @@ const Orders = () => {
   };
 
   useEffect(() => {
-    loadOrderData();
-    loadUserDetails();
+    if (!token) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      await Promise.all([loadOrderData(), loadUserDetails()]);
+      setLoading(false);
+    };
+
+    fetchData();
   }, [token]);
 
   return (
     <div className="border-t pt-16">
+      
       <div className="text-2xl">
-        <Title text1={"MY"} text2={"ORDERS"} />
+        <Title text1={"АКТИВНОСТ НА"} text2={"ПРОФИЛ"} />
       </div>
-
+      
       <div className="mb-6 p-4 bg-gray-100 rounded-lg shadow-md">
         <p className="text-lg font-semibold">
-          Вашият ранг: <span className="text-blue-600">{userDetails.rank}</span>
+          Вашият ранг: <span className="text-blue-600">Genious {userDetails.rank || "Няма"}</span>
         </p>
         <p className="text-sm text-gray-600">
-          Общ оборот: {currency} {userDetails.totalSpent.toFixed(2)}
+          Общ оборот: {currency} {userDetails.moneyspent.toFixed(2)}
         </p>
       </div>
+      
+      <div className="text-2xl">
+        <Title text1={"МОИТЕ"} text2={"ПОРЪЧКИ"} />
+      </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse">
-          <thead>
-            <tr>
-              <th className="border-b py-3 px-4 text-left">НОМЕР НА ПОРЪЧКАТА</th>
-              <th className="border-b py-3 px-4 text-left">ПРОДУКТИ</th>
-              <th className="border-b py-3 px-4 text-left">ЦЕНА</th>
-              <th className="border-b py-3 px-4 text-left">ДАТА</th>
-              <th className="border-b py-3 px-4 text-left">ПЛАЩАНЕ</th>
-              <th className="border-b py-3 px-4 text-left">ДОСТАВЧИК</th>
-              <th className="border-b py-3 px-4 text-left">СТАТУС</th>
-              <th className="border-b py-3 px-4 text-left">ДЕЙСТВИЯ</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orderData.length === 0 ? (
+      {loading ? (
+        <p className="text-center text-gray-500">Зареждане...</p>
+      ) : orderData.length === 0 ? (
+        <p className="text-center text-gray-500 py-10">ВСЕ ОЩЕ НЯМАТЕ ПОРЪЧКИ.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse">
+            <thead>
               <tr>
-                <td colSpan="8" className="text-center py-10 text-gray-500">
-                  ВСЕ ОЩЕ НЯМАТЕ ПОРЪЧКИ.
-                </td>
+                <th className="border-b py-3 px-4 text-left">НОМЕР НА ПОРЪЧКАТА</th>
+                <th className="border-b py-3 px-4 text-left">ПРОДУКТИ</th>
+                <th className="border-b py-3 px-4 text-left">ЦЕНА</th>
+                <th className="border-b py-3 px-4 text-left">ДАТА</th>
+                <th className="border-b py-3 px-4 text-left">ПЛАЩАНЕ</th>
+                <th className="border-b py-3 px-4 text-left">ДОСТАВЧИК</th>
+                <th className="border-b py-3 px-4 text-left">СТАТУС</th>
               </tr>
-            ) : (
-              orderData.map((order, orderIndex) => (
-                <tr key={orderIndex} className="border-t border-b text-gray-700">
+            </thead>
+            <tbody>
+              {orderData.map((order, index) => (
+                <tr key={index} className="border-t border-b text-gray-700">
                   <td className="py-4 px-4">{order._id}</td>
                   <td className="py-4 px-4">
                     {order.items.length > 0 ? (
-                      order.items.map((item, itemIndex) => {
-                        const itemParts = item.split(" x ");
-                        const productName = itemParts[0];
-                        const quantity = itemParts[1] ? itemParts[1] : "N/A";
-                        const price = itemParts[2];
-
-                        return (
-                          <p key={itemIndex}>
-                            {productName} x {quantity} x {price}
-                          </p>
-                        );
-                      })
+                      order.items.map((item, idx) => <p key={idx}>{item}</p>)
                     ) : (
                       <p>НЯМА ПРОДУКТИ</p>
                     )}
                   </td>
-
-                  <td className="py-4 px-4">
-                    {currency} {order.amount}
-                  </td>
-                  <td className="py-4 px-4">
-                    {new Date(order.date).toLocaleDateString()}
-                  </td>
-                  <td className="py-4 px-4">
-                    {order.payment ? "Completed" : "Pending"}
-                  </td>
+                  <td className="py-4 px-4">{currency} {order.amount}</td>
+                  <td className="py-4 px-4">{new Date(order.date).toLocaleDateString()}</td>
+                  <td className="py-4 px-4">{order.payment ? "Completed" : "Pending"}</td>
                   <td className="py-4 px-4">{order.delivery_company}</td>
                   <td className="py-4 px-4">
-                    <span
-                      className={`min-w-2 h-2 rounded-full ${
-                        order.status === "Delivered"
-                          ? "bg-green-500"
-                          : order.status === "Pending"
-                          ? "bg-yellow-500"
-                          : "bg-red-500"
-                      }`}
-                    ></span>
-                    {order.status}
-                  </td>
-                  <td className="py-4 px-4">
-                    <button
-                      onClick={() => loadOrderData()}
-                      className="border px-4 py-2 text-sm font-medium rounded-sm"
-                    >
-                      ПРОСЛЕДИ ПОРЪЧКАТА СИ
-                    </button>
+                    <span className={`px-2 py-1 rounded-lg text-white ${order.status === "Delivered" ? "bg-green-500" : order.status === "Pending" ? "bg-yellow-500" : "bg-red-500"}`}>
+                      {order.status}
+                    </span>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
