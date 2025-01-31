@@ -136,4 +136,33 @@ const adminLogin = async (req, res) => {
     }
 };
 
-export { loginUser, registerUser, adminLogin, updateUserRanks, getUserDetails, calculateRank };
+const deleteUser = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        
+        const user = await userModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        await orderModel.deleteMany({ user: userId });
+        await userModel.findByIdAndDelete(userId);
+        
+        res.json({ success: true, message: "User deleted successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: "Error deleting user", error });
+    }
+};
+
+const listUsers = async (req, res) => {
+    try {
+        const users = await userModel.find().select("-password");
+        res.json({ success: true, users });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: "Error fetching users", error });
+    }
+};
+
+export { loginUser, registerUser, adminLogin, updateUserRanks, getUserDetails, calculateRank, deleteUser, listUsers };

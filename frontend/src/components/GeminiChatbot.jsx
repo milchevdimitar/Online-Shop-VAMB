@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { ShopContext } from '../context/ShopContext';
 import ReactMarkdown from "react-markdown";
+import { Send, MessageSquare } from "lucide-react";
 
 const GeminiChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,10 +17,10 @@ const GeminiChatbot = () => {
     const userMessage = { sender: "user", text: input };
     setMessages([...messages, userMessage]);
     setInput("");
-    setLoading(true); 
+    setLoading(true);
 
     try {
-      console.log('Изпращане на съобщение към сървъра:', input);
+      console.log("Изпращане на съобщение към сървъра:", input);
 
       const response = await fetch(`${backendUrl}/api/geminiChat`, {
         method: "POST",
@@ -28,7 +29,7 @@ const GeminiChatbot = () => {
       });
 
       if (!response.ok) {
-        console.error('Грешка в отговора от сървъра:', response);
+        console.error("Грешка в отговора от сървъра:", response);
         return;
       }
 
@@ -36,7 +37,7 @@ const GeminiChatbot = () => {
       const botMessage = { sender: "bot", text: data.reply };
       setMessages((prevMessages) => [...prevMessages, userMessage, botMessage]);
     } catch (error) {
-      console.error('Грешка при изпращане на съобщението:', error);
+      console.error("Грешка при изпращане на съобщението:", error);
     } finally {
       setLoading(false);
     }
@@ -46,24 +47,22 @@ const GeminiChatbot = () => {
     <div>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 p-4 bg-blue-600 text-white rounded-full shadow-lg"
+        className="fixed bottom-4 right-4 p-4 bg-black text-white rounded-full shadow-lg flex items-center gap-2 hover:bg-gray-800 transition"
       >
-        Имате въпрос ?
+        <MessageSquare size={20} /> Имате въпрос?
       </button>
 
       {isOpen && (
-        <div className="fixed bottom-16 right-4 w-80 bg-white shadow-lg rounded-lg p-4">
-          <div className="h-64 overflow-y-scroll">
+        <div className="fixed bottom-16 right-4 w-80 bg-white shadow-2xl rounded-xl p-4 border border-gray-300">
+          <div className="h-64 overflow-y-scroll p-2 space-y-2">
             {messages.map((msg, index) => (
               <div
                 key={index}
-                className={`mb-2 ${
-                  msg.sender === "user" ? "text-right" : "text-left"
-                }`}
+                className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 <span
-                  className={`inline-block px-3 py-2 rounded-lg ${
-                    msg.sender === "user" ? "bg-blue-500 text-white" : "bg-gray-200"
+                  className={`px-3 py-2 max-w-[80%] rounded-lg text-sm ${
+                    msg.sender === "user" ? "bg-black text-white" : "bg-gray-200"
                   }`}
                 >
                   {msg.sender === "bot" ? (
@@ -76,27 +75,24 @@ const GeminiChatbot = () => {
             ))}
           </div>
 
-          <div className="mt-4 flex">
+          <div className="mt-4 flex items-center border border-gray-300 rounded-lg overflow-hidden">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              className="flex-1 p-2 border rounded-l-lg"
-              placeholder="Съобщение..."
+              className="flex-1 p-2 outline-none text-sm"
+              placeholder="Напишете съобщение..."
             />
             <button
               onClick={sendMessage}
-              className="px-0.1 bg-blue-500 text-white rounded-r-lg"
+              className="p-2 bg-black text-white flex items-center justify-center hover:bg-gray-800 transition"
             >
-              Изпрати
+              <Send size={18} />
             </button>
           </div>
 
           {loading && (
-            <div className="mt-2 text-center text-gray-500">
-              <span className="dot dot1">.</span>
-              <span className="dot dot2">.</span>
-              <span className="dot dot3">.</span>
+            <div className="mt-2 text-center text-gray-500 animate-pulse">...
             </div>
           )}
         </div>
