@@ -3,7 +3,6 @@ import userModel from "../models/userModel.js";
 const addToCart = async (req, res) => {
     try {
         const { userId, itemId } = req.body;
-
         if (!userId || !itemId) {
             return res.status(400).json({ success: false, message: "UserId and ItemId are required" });
         }
@@ -34,7 +33,6 @@ const addToCart = async (req, res) => {
 const updateCart = async (req, res) => {
     try {
         const { userId, itemId, quantity } = req.body;
-
         if (!userId || !itemId || typeof quantity !== "number" || quantity < 0) {
             return res.status(400).json({ success: false, message: "Invalid input. UserId, ItemId, and a valid quantity are required" });
         }
@@ -62,11 +60,9 @@ const updateCart = async (req, res) => {
     }
 };
 
-// Get user cart data
 const getUserCart = async (req, res) => {
     try {
         const { userId } = req.body;
-
         if (!userId) {
             return res.status(400).json({ success: false, message: "UserId is required" });
         }

@@ -8,7 +8,6 @@ image = Image.open(input_path)
 image = image.convert("RGBA")
 r, g, b, a = image.split()
 
-# Invert only the RGB channels
 rgb_image = Image.merge("RGB", (r, g, b))
 inverted_image = ImageOps.invert(rgb_image)
 inverted_image = Image.merge("RGBA", (inverted_image.getchannel("R"), 

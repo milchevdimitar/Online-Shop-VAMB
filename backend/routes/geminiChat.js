@@ -2,12 +2,12 @@ import express from "express";
 import axios from "axios";
 import GEMINI_API from "../credentials/geminiapikey.js";
 
-const router = express.Router();
+const geminiRouter = express.Router();
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
 const API_KEY = GEMINI_API;
 
-router.post("/", async (req, res) => {
+geminiRouter.post("/", async (req, res) => {
   const userMessage = req.body.message;
   console.log("Получено съобщение от клиента:", userMessage);
 
@@ -57,4 +57,4 @@ router.post("/", async (req, res) => {
   }
 });
 
-export default router;
+export default geminiRouter;
