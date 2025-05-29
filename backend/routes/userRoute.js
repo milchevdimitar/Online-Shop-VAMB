@@ -1,5 +1,5 @@
 import express from 'express';
-import { loginUser,registerUser,adminLogin, updateUserRanks, getUserDetails, deleteUser, listUsers} from '../controllers/userController.js';
+import { loginUser,registerUser,adminLogin, updateUserRanks, getUserDetails, deleteUser, listUsers} from '../backend_logic/userSrc.js';
 import auth from '../middleware/auth.js';
 import authUser from '../middleware/authUser.js';
 

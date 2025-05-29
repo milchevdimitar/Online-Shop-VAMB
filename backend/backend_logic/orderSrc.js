@@ -1,33 +1,26 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import Stripe from 'stripe'
-import { calculateRank } from "./userController.js";
+import { getOrderConfig, getDiscountByRank, calculateRank, getSecretKey } from "../backend_logic/settings&secretsSrc.js";
 
-const currency = 'bgn'
-const deliveryCharge = 10
+let stripe;
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
-
-const getDiscountByRank = (rank) => {
-    const discounts = {
-        "4": 0,   
-        "3": 5,  
-        "2": 10,   
-        "1": 20 
-    };
-
-    return discounts[rank] || 0;
+const loadKeys = async () => {
+  const stripeKey = await getSecretKey('stripe_secret_key');
+  stripe = new Stripe(stripeKey);
 };
 
+loadKeys();
 
 const placeOrder = async (req, res) => {
     try {
         const { userId, items, amount, address, delivery_company_name } = req.body;
 
+        const { deliveryCharge, currency } = await getOrderConfig();
+
         const user = await userModel.findById(userId);
         if (!user) return res.status(404).json({ success: false, message: "User not found" });
-
-        const discountPercentage = getDiscountByRank(user.rank);
+        const discountPercentage = await getDiscountByRank(user.rank);
         const discountAmount = ((amount - deliveryCharge) * discountPercentage) / 100;
         const finalAmount = (amount - deliveryCharge) - discountAmount;
 
@@ -60,12 +53,15 @@ const placeOrder = async (req, res) => {
 const placeOrderStripe = async (req, res) => {
     try {
         const { userId, items, amount, address, delivery_company_name } = req.body;
+
+        const { deliveryCharge, currency } = await getOrderConfig();
+
         const { origin } = req.headers;
 
         const user = await userModel.findById(userId);
         if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-        const discountPercentage = getDiscountByRank(user.rank);
+        const discountPercentage = await getDiscountByRank(user.rank);
         const discountAmount = ((amount - deliveryCharge) * discountPercentage) / 100;
         const finalAmount = (amount - deliveryCharge) - discountAmount;
 

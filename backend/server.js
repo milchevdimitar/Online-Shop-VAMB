@@ -9,6 +9,7 @@ import productRouter from './routes/productRoute.js'
 import cartRouter from './routes/cartRoute.js'
 import orderRouter from './routes/orderRoute.js'
 import geminiRouter from "./routes/geminiChat.js"
+import settingsRouter from './routes/settingsRoute.js'
 import SESSION_SECRET from './credentials/session_key.js';
 
 const app = express()
@@ -34,6 +35,7 @@ app.use(
   );
 
 app.use("/api/geminiChat", geminiRouter);
+app.use('/api/settings', settingsRouter);
 
 app.get('/',(req,res)=>{
     res.send("API Working")
